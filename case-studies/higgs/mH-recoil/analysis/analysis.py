@@ -1,6 +1,6 @@
 
 # analysis config
-flavor = "mumu" # mumu or ee
+flavor = "ee" # mumu or ee
 do_mass = True # for mass analysis, extra cut on cos(theta_miss)
 do_gen = False # replace reco-particles by the corresponding gen particle
 do_syst = False
@@ -132,22 +132,18 @@ def build_graph(df, dataset):
         df = df.Define("daughter_higgs_collapsed", "daughter_higgs.size()>1 ? ((abs(daughter_higgs[0])+abs(daughter_higgs[1]))*0.5) : -1000")
 
     # baseline selections and histograms
-    results.append(df.Histo1D(("leps_all_p_cut0", "", *bins_p_mu), "leps_all_p", "nominal_weight"))
-    results.append(df.Histo1D(("leps_all_theta_cut0", "", *bins_theta), "leps_all_theta", "nominal_weight"))
-    results.append(df.Histo1D(("leps_all_phi_cut0", "", *bins_phi), "leps_all_phi", "nominal_weight"))
-    results.append(df.Histo1D(("leps_all_q_cut0", "", *bins_charge), "leps_all_q", "nominal_weight"))
-    results.append(df.Histo1D(("leps_all_no_cut0", "", *bins_count), "leps_all_no", "nominal_weight"))
-    results.append(df.Histo1D(("leps_all_iso_cut0", "", *bins_iso), "leps_all_iso", "nominal_weight"))
-    results.append(df.Histo1D(("leps_all_reso_p_cut0", "", *bins_resolution), "leps_all_reso_p", "nominal_weight"))
+    results.append(df.Histo1D(("leps_all_p_presel", "", *bins_p_mu), "leps_all_p", "nominal_weight"))
+    results.append(df.Histo1D(("leps_all_theta_presel", "", *bins_theta), "leps_all_theta", "nominal_weight"))
+    results.append(df.Histo1D(("leps_all_no_presel", "", *bins_count), "leps_all_no", "nominal_weight"))
+    results.append(df.Histo1D(("leps_all_iso_presel", "", *bins_iso), "leps_all_iso", "nominal_weight"))
+    results.append(df.Histo1D(("leps_all_reso_p_presel", "", *bins_resolution), "leps_all_reso_p", "nominal_weight"))
 
-
-    results.append(df.Histo1D(("leps_p_cut0", "", *bins_p_mu), "leps_p", "nominal_weight"))
-    results.append(df.Histo1D(("leps_theta_cut0", "", *bins_theta), "leps_theta", "nominal_weight"))
-    results.append(df.Histo1D(("leps_phi_cut0", "", *bins_phi), "leps_phi", "nominal_weight"))
-    results.append(df.Histo1D(("leps_q_cut0", "", *bins_charge), "leps_q", "nominal_weight"))
-    results.append(df.Histo1D(("leps_no_cut0", "", *bins_count), "leps_no", "nominal_weight"))
-    results.append(df.Histo1D(("leps_iso_cut0", "", *bins_iso), "leps_iso"))
-    results.append(df.Histo1D(("leps_reso_p_cut0", "", *bins_resolution), "leps_reso_p", "nominal_weight"))
+    results.append(df.Histo1D(("leps_p_presel", "", *bins_p_mu), "leps_p", "nominal_weight"))
+    results.append(df.Histo1D(("leps_theta_presel", "", *bins_theta), "leps_theta", "nominal_weight"))
+    results.append(df.Histo1D(("leps_no_presel", "", *bins_count), "leps_no", "nominal_weight"))
+    results.append(df.Histo1D(("leps_iso_presel", "", *bins_iso), "leps_iso"))
+    results.append(df.Histo1D(("leps_reso_p_presel", "", *bins_resolution), "leps_reso_p", "nominal_weight"))
+    
 
     if dataset in sigProcs: 
         results.append(df.Histo1D(("higgs_decay_cut0", "", *bins_count), "daughter_higgs_collapsed", "nominal_weight"))
@@ -188,24 +184,24 @@ def build_graph(df, dataset):
 
     df = df.Define("acoplanarity", "FCCAnalyses::ZHfunctions::acoplanarity(leps)")
     df = df.Define("acolinearity", "FCCAnalyses::ZHfunctions::acolinearity(leps)")
-    
-    results.append(df.Histo1D(("zll_m_cut2", "", *bins_m_ll), "zll_m", "nominal_weight"))
 
     if dataset in sigProcs:
         results.append(df.Histo1D(("higgs_decay_cut2", "", *bins_count), "daughter_higgs_collapsed", "nominal_weight"))
 
     #########
     ### CUT 3: Z mass window
-    #########  
+    #########
+    results.append(df.Histo1D(("zll_m_nmone", "", *bins_m_ll), "zll_m", "nominal_weight"))
     df = df.Filter("zll_m > 86 && zll_m < 96")
     results.append(df.Histo1D(("cutFlow", "", *bins_count), "cut3"))
-    results.append(df.Histo1D(("zll_p_cut3", "", *bins_p_mu), "zll_p"))
+    
     if dataset in sigProcs:
         results.append(df.Histo1D(("higgs_decay_cut3", "", *bins_count), "daughter_higgs_collapsed", "nominal_weight"))
 
     #########
     ### CUT 4: Z momentum
-    #########  
+    #########
+    results.append(df.Histo1D(("zll_p_nmone", "", *bins_p_mu), "zll_p"))
     df = df.Filter("zll_p > 20 && zll_p < 70")
     results.append(df.Histo1D(("cutFlow", "", *bins_count), "cut4", "nominal_weight"))
     results.append(df.Histo1D(("zll_recoil_cut4", "", *bins_recoil), "zll_recoil_m", "nominal_weight"))
@@ -214,7 +210,8 @@ def build_graph(df, dataset):
 
     #########
     ### CUT 5: recoil cut
-    #########  
+    #########
+    results.append(df.Histo1D(("zll_recoil_m_nmone", "", *bins_recoil), "zll_recoil_m", "nominal_weight"))
     df = df.Filter("zll_recoil_m < 140 && zll_recoil_m > 120")
     results.append(df.Histo1D(("cutFlow", "", *bins_count), "cut5", "nominal_weight"))
     results.append(df.Histo1D(("cosThetaMiss_cut5", "", *bins_cosThetaMiss), "cosTheta_miss", "nominal_weight"))
@@ -222,8 +219,9 @@ def build_graph(df, dataset):
         results.append(df.Histo1D(("higgs_decay_cut5", "", *bins_count), "daughter_higgs_collapsed", "nominal_weight"))
 
     #########
-    ### CUT 6: cosThetaMiss, for mass analysis
-    #########  
+    ### CUT 6: cosThetaMiss, only for mass analysis
+    #########
+    results.append(df.Histo1D(("cosThetaMiss_nmone", "", *bins_cosThetaMiss), "cosTheta_miss", "nominal_weight"))
     if do_mass:
         df = df.Filter("cosTheta_miss < 0.98")
     if dataset in sigProcs: 
